@@ -28,7 +28,7 @@ mongoose
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./client/build");
+    cb(null, "../client/build");
   },
   filename: (req, file, cb) => {
     cb(null, req.body.name);
@@ -40,7 +40,7 @@ const uploadImage = async (req, res, next) => {
   form.parse(req, async (err, fields, files) => {
     var oldpath = files.file.filepath;
     const newPath =
-      path.join(__dirname, "../client/build/") + fields.name
+      path.join(__dirname, "./client/build/") + fields.name
     console.log("reached here", newPath)
     fs.rename(oldpath, newPath, function (err) {
       if (err) throw err;
