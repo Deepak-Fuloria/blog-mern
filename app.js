@@ -5,16 +5,16 @@ const mongoose = require("mongoose");
 const authRoute = require("./routes/auth");
 const userRoute = require("./routes/users");
 const postRoute = require("./routes/posts");
-// const {uploadImage} = require("./routes/upload");
 const categoryRoute = require("./routes/categories");
-const multer = require("multer");
+// const uploadImage = require("./routes/upload");
 const formidable = require('formidable');
 const path = require("path");
 var cors = require('cors')
 const fs = require("fs")
 dotenv.config();
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "./client/build")));
+app.use(express.static(path.join(__dirname, "client", "build")));
+
 app.use(cors())
 mongoose
   .connect(process.env.MONGO_URL, {
@@ -27,20 +27,35 @@ mongoose
   .catch((err) => console.log(err));
 
 
+const uploadImage = (req, res) => {
+  const form = new formidable.IncomingForm({
+    uploadDir: path.join(__dirname, 'client', 'build', 'temp'),
+  });
 
-const uploadImage = async (req, res, next) => {
-  var form = new formidable.IncomingForm();
+
+
   form.parse(req, async (err, fields, files) => {
+    if (err) {
+      console.error('Form parsing error:', err);
+      return res.status(500).send('Error while processing form.');
+    }
+
     var oldpath = files.file.filepath;
-    const newPath =
-      path.join(__dirname, "./client/build/") + fields.name
-    console.log("reached here", newPath)
-    fs.rename(oldpath, newPath, function (err) {
-      if (err) throw err;
-      res.send("file uploaded succesfully")
+    const newpath = path.join(__dirname, 'client', 'build', fields.name);
+
+    fs.rename(oldpath, newpath, function (err) {
+      if (err) {
+        console.error('File rename error:', err);
+        return res.status(500).send('Error while renaming file.');
+      }
+      else {
+        res.send("file uploaded succesfully")
+      }
     });
   });
 };
+
+
 
 
 

@@ -1,31 +1,39 @@
-const uploadImage = async (req, res, next) => {
-    //  const form = formidable({ multiples: true });
-    var form = new formidable.IncomingForm();
-    let filesname = "";
-    form.parse(req, async (err, fields, files) => {
-      // console.log("🚀 ~ file: index.js:44 ~ form.parse ~ files:-----", files.file.filepath)
-      var oldpath = files.file.filepath;
-      console.log("reached here",fields)
-      
-      const newPath =
-        path.join(__dirname, "../client/build/") +
-        files.file.newFilename +
-        files.file.originalFilename;
-        // console.log("reached here",newPath)
-      fs.rename(oldpath, newPath, function (err) {
-        if (err) throw err;
-        filesname = files.file.newFilename + files.file.originalFilename;
-        console.log("🚀 ~ file: index.js:57 ~ File:", files)
-        console.log("🚀 ~ file: index.js:57 ~ originalFilename:", files.file.originalFilename)
-        console.log("🚀 ~ file: index.js:57 ~ newFilename:", files.file.newFilename)
-        console.log("🚀 ~ file: index.js:51 ~ filesname:", filesname)
-        res.send("file uploaded succesfully")
-      });
+
+
+
+
+
+
+
+
+const uploadImage = (req, res) => {
+  const form = new formidable.IncomingForm({
+    uploadDir: path.join(__dirname, 'client', 'build', 'temp'),
+  });
+
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      console.error('Form parsing error:', err);
+      return res.status(500).send('Error while processing form.');
+    }
+
+    console.log(req)
+    console.log("reached here", files.file)
+    var oldpath = files.file.filepath;
+    const newpath = path.join(__dirname, 'client', 'build', 'uploads', files.file.originalFilename);
+
+    fs.rename(oldpath, newpath, function (err) {
+      if (err) {
+        console.error('File rename error:', err);
+        return res.status(500).send('Error while renaming file.');
+      } else {
+        res.send("file uploaded successfully");
+      }
     });
-  };
+  });
+};
 
 
 
 
-
-  module.exports={uploadImage}
+module.exports = uploadImage 
